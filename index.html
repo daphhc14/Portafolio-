@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daphne Hidalgo — UX/UI Designer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script type="module" src="https://unpkg.com/@splinetool/viewer@latest/build/spline-viewer.js"></script>
+
+  <style>
+    /* ===========================
+       RESET & BASE
+    =========================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --accent:      #E8614E;
+      --accent-dark: #c04a39;
+      --bg:          #000000;
+      --text:        #ffffff;
+      --text-muted:  rgba(255,255,255,0.7);
+      --glass-bg:    rgba(255,255,255,0.05);
+      --glass-border:rgba(255,255,255,0.12);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ===========================
+       BACKGROUND ORBS
+    =========================== */
+    .orb-wrap {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(90px);
+    }
+
+    .orb-1 {
+      width: 560px; height: 560px;
+      background: radial-gradient(circle, rgba(180,60,40,0.38) 0%, transparent 70%);
+      top: 5%; left: -12%;
+      animation: drift1 12s ease-in-out infinite;
+    }
+    .orb-2 {
+      width: 640px; height: 640px;
+      background: radial-gradient(circle, rgba(200,80,100,0.30) 0%, transparent 70%);
+      top: 25%; right: -16%;
+      animation: drift2 8s ease-in-out infinite;
+    }
+    .orb-3 {
+      width: 440px; height: 440px;
+      background: radial-gradient(circle, rgba(160,50,35,0.26) 0%, transparent 70%);
+      bottom: 18%; left: 28%;
+      animation: drift3 10s ease-in-out infinite;
+    }
+
+    @keyframes drift1 {
+      0%,100% { transform: translate(0,0); }
+      25%      { transform: translate(32px,-44px); }
+      50%      { transform: translate(-22px,34px); }
+      75%      { transform: translate(44px,22px); }
+    }
+    @keyframes drift2 {
+      0%,100% { transform: translate(0,0); }
+      25%      { transform: translate(-32px,34px); }
+      50%      { transform: translate(22px,-44px); }
+      75%      { transform: translate(-44px,-22px); }
+    }
+    @keyframes drift3 {
+      0%,100% { transform: translate(0,0); }
+      33%      { transform: translate(38px,28px); }
+      66%      { transform: translate(-28px,-22px); }
+    }
+
+    /* ===========================
+       PAGE WRAPPER
+    =========================== */
+    .page {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ===========================
+       NAVBAR
+    =========================== */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 52px;
+      background: rgba(0,0,0,0.35);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    .logo {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--accent);
+      text-decoration: none;
+      letter-spacing: 0.03em;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 38px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text);
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 400;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      color: var(--accent);
+    }
+
+    /* ===========================
+       HERO SECTION
+    =========================== */
+    #hero {
+      min-height: 100vh;
+      padding: 130px 52px 90px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .hero-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 32px;
+      margin-bottom: 72px;
+    }
+
+    .hero-left { flex: 1; }
+
+    .hero-name {
+      font-size: clamp(54px, 9vw, 100px);
+      font-weight: 800;
+      line-height: 1.0;
+      color: #fff;
+      margin-bottom: 14px;
+    }
+
+    .hero-subtitle {
+      font-size: 18px;
+      font-weight: 400;
+      color: var(--text-muted);
+    }
+
+    .hero-spline {
+      flex: 0 0 auto;
+      width: clamp(220px, 36vw, 400px);
+      height: clamp(220px, 36vw, 400px);
+      /* hide spline internal UI chrome */
+      border-radius: 20px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    spline-viewer {
+      width: 100%;
+      height: 100%;
+      --spline-logo: none;
+    }
+
+    /* hide the "Built with Spline" watermark */
+    spline-viewer::part(logo) { display: none; }
+
+    .hero-divider {
+      width: 100%;
+      height: 1px;
+      background: rgba(255,255,255,0.08);
+      margin-bottom: 52px;
+    }
+
+    .hero-bio {
+      max-width: 600px;
+      margin: 0 auto 48px;
+      font-size: 15px;
+      line-height: 1.75;
+      color: rgba(255,255,255,0.82);
+      text-align: center;
+    }
+
+    .hero-bio .hl { color: var(--accent); }
+
+    /* ===========================
+       SKILL PILLS
+    =========================== */
+    .skills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .pill {
+      padding: 10px 24px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(8px);
+      font-size: 14px;
+      color: rgba(255,255,255,0.85);
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .pill:hover {
+      border-color: rgba(232,97,78,0.45);
+      background: rgba(232,97,78,0.08);
+    }
+
+    /* ===========================
+       PROJECTS SECTION
+    =========================== */
+    #work {
+      padding: 80px 52px 100px;
+    }
+
+    .section-heading {
+      font-size: clamp(40px, 7vw, 72px);
+      font-weight: 800;
+      line-height: 1.05;
+      color: #fff;
+      margin-bottom: 64px;
+    }
+
+    .cards {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .card {
+      display: flex;
+      min-height: 320px;
+      border-radius: 18px;
+      border: 1px solid var(--glass-border);
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      overflow: hidden;
+      transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(255,255,255,0.22);
+      box-shadow: 0 10px 48px rgba(232,97,78,0.14);
+    }
+
+    .card-info {
+      flex: 0 0 280px;
+      padding: 48px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .card-name {
+      font-size: 28px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag {
+      padding: 5px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.04);
+      font-size: 12px;
+      color: rgba(255,255,255,0.68);
+    }
+
+    .btn-work {
+      display: inline-block;
+      margin-top: auto;
+      padding: 12px 28px;
+      border-radius: 999px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      width: fit-content;
+      transition: background 0.2s, transform 0.15s;
+    }
+
+    .btn-work:hover {
+      background: var(--accent-dark);
+      transform: scale(1.03);
+    }
+
+    .card-image {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ---- Civika mockup ---- */
+    .civika-bg {
+      background: #0e1520;
+    }
+
+    /* ---- E-Cup mockup ---- */
+    .ecup-bg {
+      background: #c4a07a;
+    }
+
+    .card-image svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* ===========================
+       ABOUT SECTION
+    =========================== */
+    #about {
+      padding: 110px 52px 100px;
+      position: relative;
+    }
+
+    /* warm maroon radial glow for about section */
+    #about::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 700px; height: 560px;
+      background: radial-gradient(ellipse, rgba(100,18,28,0.5) 0%, transparent 68%);
+      filter: blur(50px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .about-inner { position: relative; z-index: 1; }
+
+    .about-header {
+      display: flex;
+      align-items: center;
+      gap: 64px;
+      margin-bottom: 72px;
+    }
+
+    .profile-pic {
+      flex-shrink: 0;
+      width: 200px; height: 200px;
+      border-radius: 50%;
+      background: #3a3535;
+      overflow: hidden;
+    }
+
+    .profile-pic img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* silhouette placeholder SVG shown when no photo */
+    .profile-pic .placeholder-svg {
+      width: 100%; height: 100%;
+    }
+
+    .about-title {
+      font-size: clamp(52px, 8.5vw, 96px);
+      font-weight: 400;
+      color: rgba(255,236,228,0.90);
+      line-height: 1;
+    }
+
+    .about-bio {
+      max-width: 780px;
+      margin: 0 auto 80px;
+    }
+
+    .about-bio p {
+      font-size: 16px;
+      line-height: 1.8;
+      color: rgba(255,255,255,0.84);
+      margin-bottom: 28px;
+      text-indent: 2em;
+    }
+
+    /* ===========================
+       CONTACT
+    =========================== */
+    .contact-section {
+      max-width: 780px;
+      margin: 0 auto;
+    }
+
+    .contact-title {
+      font-size: clamp(34px, 5vw, 56px);
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 44px;
+    }
+
+    .contact-row {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      margin-bottom: 32px;
+    }
+
+    .contact-icon {
+      flex-shrink: 0;
+      width: 68px; height: 68px;
+      border-radius: 16px;
+      background: linear-gradient(145deg, #E8614E 0%, #d4738a 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .contact-icon svg {
+      width: 30px; height: 30px;
+      fill: #fff;
+    }
+
+    .contact-label {
+      font-size: 18px;
+      color: rgba(255,255,255,0.88);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .contact-label:hover { color: var(--accent); }
+
+    /* ===========================
+       RESPONSIVE
+    =========================== */
+    @media (max-width: 900px) {
+      nav { padding: 18px 28px; }
+      .nav-links { gap: 24px; }
+
+      #hero { padding: 110px 28px 70px; }
+      .hero-row {
+        flex-direction: column-reverse;
+        align-items: flex-start;
+      }
+      .hero-spline {
+        width: clamp(180px, 55vw, 280px);
+        height: clamp(180px, 55vw, 280px);
+        align-self: center;
+      }
+
+      #work { padding: 60px 28px 80px; }
+      .card {
+        flex-direction: column;
+        min-height: unset;
+      }
+      .card-info { flex: unset; padding: 32px 28px; }
+      .card-image { min-height: 220px; border-radius: 0; }
+
+      #about { padding: 80px 28px 80px; }
+      .about-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 32px;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .hero-name { font-size: 48px; }
+      .section-heading { font-size: 38px; }
+      .about-title { font-size: 48px; }
+      .card-info { padding: 28px 20px; }
+      #hero { padding: 100px 20px 60px; }
+      #work { padding: 50px 20px 70px; }
+      #about { padding: 70px 20px 70px; }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- ── Animated background orbs ── -->
+  <div class="orb-wrap" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <div class="page">
+
+    <!-- ══════════════════════════════
+         NAVBAR
+    ══════════════════════════════ -->
+    <nav>
+      <a href="#hero" class="logo">DH</a>
+      <ul class="nav-links">
+        <li><a href="#work">Work</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#">CV</a></li>
+      </ul>
+    </nav>
+
+    <!-- ══════════════════════════════
+         HERO
+    ══════════════════════════════ -->
+    <section id="hero">
+      <div class="hero-row">
+        <!-- left: name + title -->
+        <div class="hero-left">
+          <h1 class="hero-name">Daphne<br>Hidalgo</h1>
+          <p class="hero-subtitle">UX/UI Designer</p>
+        </div>
+
+        <!-- right: Spline 3D blob -->
+        <div class="hero-spline">
+          <spline-viewer
+            url="https://prod.spline.design/colorbox3copy-76c137192133ff761a6e5f0148840888/scene.splinecode"
+            loading-anim>
+          </spline-viewer>
+        </div>
+      </div>
+
+      <!-- thin divider -->
+      <div class="hero-divider"></div>
+
+      <!-- bio -->
+      <p class="hero-bio">
+        Hi, I'm Daphne!, a UX/UI designer
+        <span class="hl">with experience in</span>
+        creating intuitive digital products and
+        <span class="hl">user-centric experiences</span>.
+        I love combining strategy, visual design and
+        <span class="hl">technology</span>.
+      </p>
+
+      <!-- skill pills -->
+      <div class="skills">
+        <span class="pill">Figma</span>
+        <span class="pill">Photoshop</span>
+        <span class="pill">Illustrator</span>
+        <span class="pill">HTML</span>
+        <span class="pill">CSS</span>
+        <span class="pill">JavaScript</span>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════
+         PROJECTS
+    ══════════════════════════════ -->
+    <section id="work">
+      <h2 class="section-heading">UX/UI<br>PROJECTS</h2>
+
+      <div class="cards">
+
+        <!-- ── Card: Civika ── -->
+        <div class="card">
+          <div class="card-info">
+            <h3 class="card-name">Civika</h3>
+            <div class="card-tags">
+              <span class="tag">Social media</span>
+              <span class="tag">Activism</span>
+              <span class="tag">Co-design</span>
+              <span class="tag">Freelance</span>
+              <span class="tag">User research</span>
+              <span class="tag">Social impact</span>
+            </div>
+            <a href="#" class="btn-work">View work</a>
+          </div>
+
+          <!-- Civika phone mockup (SVG) -->
+          <div class="card-image civika-bg">
+            <svg viewBox="0 0 520 320" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+              <defs>
+                <radialGradient id="civGlow" cx="50%" cy="50%" r="60%">
+                  <stop offset="0%" stop-color="#1e3a28" stop-opacity="0.6"/>
+                  <stop offset="100%" stop-color="#0e1520" stop-opacity="0"/>
+                </radialGradient>
+                <clipPath id="phone1clip">
+                  <rect x="0" y="0" width="116" height="210" rx="14"/>
+                </clipPath>
+                <clipPath id="phone2clip">
+                  <rect x="0" y="0" width="130" height="230" rx="14"/>
+                </clipPath>
+              </defs>
+
+              <!-- background glow -->
+              <ellipse cx="260" cy="160" rx="220" ry="150" fill="url(#civGlow)"/>
+
+              <!-- ── Civika logo label ── -->
+              <g transform="translate(34,30)">
+                <rect x="0"  y="0"  width="9" height="9" rx="2" fill="#5ba44a"/>
+                <rect x="11" y="0"  width="9" height="9" rx="2" fill="#e8614e"/>
+                <rect x="0"  y="11" width="9" height="9" rx="2" fill="#4a90d9"/>
+                <rect x="11" y="11" width="9" height="9" rx="2" fill="#f5c540"/>
+                <text x="26" y="13" font-family="Inter,sans-serif" font-size="13" font-weight="700" fill="white">CiviKa</text>
+              </g>
+
+              <!-- ── Phone 1 (left, slightly rotated) ── -->
+              <g transform="translate(98,38) rotate(-6,58,105)">
+                <!-- body -->
+                <rect width="116" height="210" rx="14" fill="#1c2838" stroke="rgba(255,255,255,0.12)" stroke-width="1.2"/>
+                <!-- screen -->
+                <rect x="7" y="14" width="102" height="178" rx="8" fill="#14201a"/>
+                <!-- top bar -->
+                <rect x="7" y="14" width="102" height="28" rx="8" fill="#2d5220"/>
+                <text x="18" y="32" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="rgba(255,255,255,0.9)">Dashboard</text>
+                <!-- post card 1 -->
+                <rect x="10" y="47" width="96" height="55" rx="6" fill="#1e3020"/>
+                <rect x="14" y="52" width="55" height="6" rx="3" fill="rgba(255,255,255,0.55)"/>
+                <rect x="14" y="62" width="40" height="4" rx="2" fill="rgba(255,255,255,0.3)"/>
+                <rect x="10" y="71" width="96" height="28" rx="4" fill="#3a6030"/>
+                <!-- post card 2 -->
+                <rect x="10" y="107" width="96" height="44" rx="6" fill="#1a2a18"/>
+                <rect x="14" y="112" width="48" height="5" rx="2" fill="rgba(255,255,255,0.45)"/>
+                <circle cx="101" cy="114" r="6" fill="#5ba44a"/>
+                <!-- action pills -->
+                <rect x="10" y="157" width="46" height="16" rx="8" fill="#5ba44a"/>
+                <rect x="61" y="157" width="46" height="16" rx="8" fill="rgba(255,255,255,0.08)"/>
+                <text x="20" y="169" font-family="Inter,sans-serif" font-size="7" fill="white">Apoyar</text>
+                <!-- notch -->
+                <rect x="40" y="10" width="36" height="4" rx="2" fill="rgba(255,255,255,0.15)"/>
+              </g>
+
+              <!-- ── Phone 2 (right, slightly rotated other way) ── -->
+              <g transform="translate(294,24) rotate(5,65,115)">
+                <rect width="130" height="230" rx="14" fill="#1c2838" stroke="rgba(255,255,255,0.12)" stroke-width="1.2"/>
+                <rect x="7" y="14" width="116" height="202" rx="8" fill="#14201a"/>
+                <!-- header -->
+                <rect x="7" y="14" width="116" height="32" rx="8" fill="#2d5220"/>
+                <text x="20" y="34" font-family="Inter,sans-serif" font-size="10" font-weight="600" fill="rgba(255,255,255,0.9)">Comunidad</text>
+                <!-- image block -->
+                <rect x="10" y="52" width="113" height="72" rx="6" fill="#274d20"/>
+                <ellipse cx="67" cy="88" rx="22" ry="22" fill="#3d7030" opacity="0.7"/>
+                <text x="56" y="93" font-family="Inter,sans-serif" font-size="16" fill="rgba(255,255,255,0.8)">🌱</text>
+                <!-- text rows -->
+                <rect x="10" y="130" width="80" height="6" rx="3" fill="rgba(255,255,255,0.45)"/>
+                <rect x="10" y="142" width="60" height="4" rx="2" fill="rgba(255,255,255,0.25)"/>
+                <!-- action row -->
+                <rect x="10" y="158" width="52" height="18" rx="9" fill="#5ba44a"/>
+                <rect x="68" y="158" width="52" height="18" rx="9" fill="rgba(255,255,255,0.07)"/>
+                <text x="22" y="170" font-family="Inter,sans-serif" font-size="7.5" fill="white">Seguir</text>
+                <!-- notch -->
+                <rect x="44" y="10" width="42" height="4" rx="2" fill="rgba(255,255,255,0.15)"/>
+              </g>
+            </svg>
+          </div>
+        </div><!-- /Civika -->
+
+        <!-- ── Card: E-Cup ── -->
+        <div class="card">
+          <div class="card-info">
+            <h3 class="card-name">E-Cup</h3>
+            <div class="card-tags">
+              <span class="tag">Social media</span>
+              <span class="tag">Health</span>
+              <span class="tag">Coffee</span>
+              <span class="tag">Design systems</span>
+              <span class="tag">Brand identity</span>
+              <span class="tag">3D animation</span>
+            </div>
+            <a href="#" class="btn-work">View work</a>
+          </div>
+
+          <!-- E-Cup phone mockup (SVG) -->
+          <div class="card-image ecup-bg">
+            <svg viewBox="0 0 520 320" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+              <defs>
+                <radialGradient id="ecupGlow" cx="50%" cy="50%" r="60%">
+                  <stop offset="0%" stop-color="#a07848" stop-opacity="0.4"/>
+                  <stop offset="100%" stop-color="#c4a07a" stop-opacity="0"/>
+                </radialGradient>
+                <linearGradient id="coffeeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#7b4a1e"/>
+                  <stop offset="100%" stop-color="#4a2c10"/>
+                </linearGradient>
+              </defs>
+
+              <rect width="520" height="320" fill="#c4a07a"/>
+              <ellipse cx="260" cy="160" rx="230" ry="150" fill="url(#ecupGlow)"/>
+
+              <!-- E-Cup header label -->
+              <text x="34" y="46" font-family="Inter,sans-serif" font-size="18" font-weight="800" fill="#3d2408">E-Cup ☕</text>
+              <text x="34" y="66" font-family="Inter,sans-serif" font-size="11" fill="#6b4010">Nescafé</text>
+
+              <!-- ── Phone 1 (left) ── -->
+              <g transform="translate(52,32) rotate(-7,55,120)">
+                <rect width="110" height="216" rx="14" fill="#f8efe2" stroke="rgba(0,0,0,0.08)" stroke-width="1"/>
+                <rect x="6" y="14" width="98" height="188" rx="8" fill="#f0e4d0"/>
+                <!-- top bar -->
+                <rect x="6" y="14" width="98" height="30" rx="8" fill="#c47a3a"/>
+                <text x="14" y="33" font-family="Inter,sans-serif" font-size="10" font-weight="700" fill="white">E-Cup</text>
+                <!-- coffee image area -->
+                <rect x="9" y="49" width="92" height="70" rx="6" fill="#d4b07a"/>
+                <!-- mug illustration -->
+                <rect x="32" y="58" width="46" height="38" rx="5" fill="url(#coffeeGrad)"/>
+                <ellipse cx="55" cy="58" rx="23" ry="6" fill="#5a3510"/>
+                <path d="M78,68 Q90,68 90,78 Q90,88 78,88" stroke="#5a3510" stroke-width="3" fill="none" stroke-linecap="round"/>
+                <!-- text rows -->
+                <rect x="9" y="124" width="70" height="5" rx="2" fill="rgba(0,0,0,0.2)"/>
+                <rect x="9" y="134" width="52" height="4" rx="2" fill="rgba(0,0,0,0.12)"/>
+                <!-- button -->
+                <rect x="9" y="150" width="92" height="20" rx="10" fill="#c47a3a"/>
+                <text x="34" y="164" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="white">Ver más</text>
+                <!-- notch -->
+                <rect x="37" y="10" width="36" height="4" rx="2" fill="rgba(0,0,0,0.1)"/>
+              </g>
+
+              <!-- ── Phone 2 (center, larger, upright) ── -->
+              <g transform="translate(192,18)">
+                <rect width="130" height="240" rx="14" fill="#f8efe2" stroke="rgba(0,0,0,0.08)" stroke-width="1"/>
+                <rect x="6" y="14" width="118" height="212" rx="8" fill="#f0e4d0"/>
+                <!-- top bar -->
+                <rect x="6" y="14" width="118" height="34" rx="8" fill="#c47a3a"/>
+                <text x="16" y="36" font-family="Inter,sans-serif" font-size="12" font-weight="800" fill="white">☕ E-Cup</text>
+                <!-- circular progress -->
+                <circle cx="65" cy="118" r="38" fill="none" stroke="rgba(0,0,0,0.08)" stroke-width="6"/>
+                <circle cx="65" cy="118" r="38" fill="none" stroke="#E8614E"
+                  stroke-width="6"
+                  stroke-dasharray="155 239"
+                  stroke-dashoffset="60"
+                  stroke-linecap="round"
+                  transform="rotate(-90,65,118)"/>
+                <text x="65" y="113" font-family="Inter,sans-serif" font-size="20" font-weight="800" fill="#3d2408" text-anchor="middle">37</text>
+                <text x="65" y="128" font-family="Inter,sans-serif" font-size="8" fill="#7a5020" text-anchor="middle">cups this month</text>
+                <!-- streak row -->
+                <rect x="10" y="166" width="50" height="20" rx="10" fill="rgba(196,122,58,0.25)"/>
+                <text x="18" y="180" font-family="Inter,sans-serif" font-size="8" fill="#3d2408">🔥 streak</text>
+                <rect x="68" y="166" width="50" height="20" rx="10" fill="rgba(196,122,58,0.25)"/>
+                <text x="78" y="180" font-family="Inter,sans-serif" font-size="8" fill="#3d2408">🏆 goal</text>
+                <!-- bottom button -->
+                <rect x="10" y="196" width="110" height="22" rx="11" fill="#c47a3a"/>
+                <text x="42" y="211" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="white">Registrar</text>
+                <!-- notch -->
+                <rect x="44" y="10" width="42" height="4" rx="2" fill="rgba(0,0,0,0.1)"/>
+              </g>
+
+              <!-- ── Phone 3 (right) ── -->
+              <g transform="translate(352,40) rotate(6,55,110)">
+                <rect width="110" height="210" rx="14" fill="#f8efe2" stroke="rgba(0,0,0,0.08)" stroke-width="1"/>
+                <rect x="6" y="14" width="98" height="182" rx="8" fill="#f0e4d0"/>
+                <!-- top bar -->
+                <rect x="6" y="14" width="98" height="28" rx="8" fill="#c47a3a"/>
+                <text x="14" y="31" font-family="Inter,sans-serif" font-size="10" font-weight="700" fill="white">Comunidad</text>
+                <!-- post blocks -->
+                <rect x="9" y="47" width="92" height="54" rx="6" fill="#ddc8a8"/>
+                <rect x="13" y="52" width="60" height="5" rx="2" fill="rgba(0,0,0,0.22)"/>
+                <rect x="13" y="62" width="44" height="4" rx="2" fill="rgba(0,0,0,0.14)"/>
+                <rect x="9" y="72" width="44" height="16" rx="8" fill="#E8614E"/>
+                <text x="18" y="83" font-family="Inter,sans-serif" font-size="7.5" fill="white">Ver post</text>
+                <rect x="9" y="106" width="92" height="44" rx="6" fill="#e8d8ba"/>
+                <rect x="13" y="112" width="55" height="5" rx="2" fill="rgba(0,0,0,0.2)"/>
+                <rect x="13" y="122" width="38" height="4" rx="2" fill="rgba(0,0,0,0.12)"/>
+                <rect x="9" y="156" width="92" height="22" rx="11" fill="#c47a3a"/>
+                <text x="28" y="170" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="white">Explorar</text>
+                <!-- notch -->
+                <rect x="37" y="10" width="36" height="4" rx="2" fill="rgba(0,0,0,0.1)"/>
+              </g>
+            </svg>
+          </div>
+        </div><!-- /E-Cup -->
+
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════
+         ABOUT
+    ══════════════════════════════ -->
+    <section id="about">
+      <div class="about-inner">
+
+        <div class="about-header">
+          <!-- Profile photo – replace src when ready -->
+          <div class="profile-pic">
+            <svg class="placeholder-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="100" cy="100" r="100" fill="#3a3535"/>
+              <ellipse cx="100" cy="82" rx="36" ry="38" fill="#5a5252"/>
+              <ellipse cx="100" cy="172" rx="62" ry="50" fill="#5a5252"/>
+            </svg>
+          </div>
+          <h2 class="about-title">About me</h2>
+        </div>
+
+        <div class="about-bio">
+          <p>I am a Product Designer and UX/UI designer graduated from Tecnológico de Monterrey with a special interest in Technology and User Experience Design. I have experience in the design of both physical and digital technology products and I am familiar with 3D modelling software such as Rhino, Blender and Spline. Also with graphic design software such as Photoshop and illustrator as well as UX/UI design software such as Figma.</p>
+          <p>Currently my goal is to continue developing in the area of UX/UI design since I believe that through user research and design thinking methodologies we can design more meaningful and useful products for our users. I firmly believe that design is a means to make a positive impact on people's lives, and that is what I like most about my profession.</p>
+        </div>
+
+        <div class="contact-section">
+          <h3 class="contact-title">Contact</h3>
+
+          <div class="contact-row">
+            <div class="contact-icon">
+              <!-- LinkedIn -->
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+              </svg>
+            </div>
+            <a href="https://www.linkedin.com/in/daphne-hidalgo-cantero" target="_blank" rel="noopener" class="contact-label">
+              Daphne Hidalgo Cantero
+            </a>
+          </div>
+
+          <div class="contact-row">
+            <div class="contact-icon">
+              <!-- Email -->
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/>
+              </svg>
+            </div>
+            <a href="mailto:daphnehc14@gmail.com" class="contact-label">daphnehc14@gmail.com</a>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </div><!-- /page -->
+
+  <script>
+    // ── Active nav link based on scroll position ──
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-links a');
+
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        navLinks.forEach(link => {
+          link.classList.toggle('active', link.getAttribute('href') === '#' + entry.target.id);
+        });
+      });
+    }, { rootMargin: '-45% 0px -45% 0px', threshold: 0 });
+
+    sections.forEach(s => observer.observe(s));
+
+    // ── Smooth scroll for all hash links ──
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        const id = a.getAttribute('href');
+        if (id === '#') return;
+        e.preventDefault();
+        const target = document.querySelector(id);
+        if (target) target.scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+  </script>
+</body>
+</html>
