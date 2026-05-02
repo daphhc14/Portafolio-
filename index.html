@@ -347,9 +347,10 @@
       background: #c4a07a;
     }
 
-    .card-image svg {
+    .card-image img {
       width: 100%;
       height: 100%;
+      object-fit: cover;
       display: block;
     }
 
@@ -397,10 +398,6 @@
       display: block;
     }
 
-    /* silhouette placeholder SVG shown when no photo */
-    .profile-pic .placeholder-svg {
-      width: 100%; height: 100%;
-    }
 
     .about-title {
       font-size: clamp(52px, 8.5vw, 96px);
@@ -603,82 +600,9 @@
             <a href="#" class="btn-work">View work</a>
           </div>
 
-          <!-- Civika phone mockup (SVG) -->
+          <!-- Civika project image -->
           <div class="card-image civika-bg">
-            <svg viewBox="0 0 520 320" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
-              <defs>
-                <radialGradient id="civGlow" cx="50%" cy="50%" r="60%">
-                  <stop offset="0%" stop-color="#1e3a28" stop-opacity="0.6"/>
-                  <stop offset="100%" stop-color="#0e1520" stop-opacity="0"/>
-                </radialGradient>
-                <clipPath id="phone1clip">
-                  <rect x="0" y="0" width="116" height="210" rx="14"/>
-                </clipPath>
-                <clipPath id="phone2clip">
-                  <rect x="0" y="0" width="130" height="230" rx="14"/>
-                </clipPath>
-              </defs>
-
-              <!-- background glow -->
-              <ellipse cx="260" cy="160" rx="220" ry="150" fill="url(#civGlow)"/>
-
-              <!-- ── Civika logo label ── -->
-              <g transform="translate(34,30)">
-                <rect x="0"  y="0"  width="9" height="9" rx="2" fill="#5ba44a"/>
-                <rect x="11" y="0"  width="9" height="9" rx="2" fill="#e8614e"/>
-                <rect x="0"  y="11" width="9" height="9" rx="2" fill="#4a90d9"/>
-                <rect x="11" y="11" width="9" height="9" rx="2" fill="#f5c540"/>
-                <text x="26" y="13" font-family="Inter,sans-serif" font-size="13" font-weight="700" fill="white">CiviKa</text>
-              </g>
-
-              <!-- ── Phone 1 (left, slightly rotated) ── -->
-              <g transform="translate(98,38) rotate(-6,58,105)">
-                <!-- body -->
-                <rect width="116" height="210" rx="14" fill="#1c2838" stroke="rgba(255,255,255,0.12)" stroke-width="1.2"/>
-                <!-- screen -->
-                <rect x="7" y="14" width="102" height="178" rx="8" fill="#14201a"/>
-                <!-- top bar -->
-                <rect x="7" y="14" width="102" height="28" rx="8" fill="#2d5220"/>
-                <text x="18" y="32" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="rgba(255,255,255,0.9)">Dashboard</text>
-                <!-- post card 1 -->
-                <rect x="10" y="47" width="96" height="55" rx="6" fill="#1e3020"/>
-                <rect x="14" y="52" width="55" height="6" rx="3" fill="rgba(255,255,255,0.55)"/>
-                <rect x="14" y="62" width="40" height="4" rx="2" fill="rgba(255,255,255,0.3)"/>
-                <rect x="10" y="71" width="96" height="28" rx="4" fill="#3a6030"/>
-                <!-- post card 2 -->
-                <rect x="10" y="107" width="96" height="44" rx="6" fill="#1a2a18"/>
-                <rect x="14" y="112" width="48" height="5" rx="2" fill="rgba(255,255,255,0.45)"/>
-                <circle cx="101" cy="114" r="6" fill="#5ba44a"/>
-                <!-- action pills -->
-                <rect x="10" y="157" width="46" height="16" rx="8" fill="#5ba44a"/>
-                <rect x="61" y="157" width="46" height="16" rx="8" fill="rgba(255,255,255,0.08)"/>
-                <text x="20" y="169" font-family="Inter,sans-serif" font-size="7" fill="white">Apoyar</text>
-                <!-- notch -->
-                <rect x="40" y="10" width="36" height="4" rx="2" fill="rgba(255,255,255,0.15)"/>
-              </g>
-
-              <!-- ── Phone 2 (right, slightly rotated other way) ── -->
-              <g transform="translate(294,24) rotate(5,65,115)">
-                <rect width="130" height="230" rx="14" fill="#1c2838" stroke="rgba(255,255,255,0.12)" stroke-width="1.2"/>
-                <rect x="7" y="14" width="116" height="202" rx="8" fill="#14201a"/>
-                <!-- header -->
-                <rect x="7" y="14" width="116" height="32" rx="8" fill="#2d5220"/>
-                <text x="20" y="34" font-family="Inter,sans-serif" font-size="10" font-weight="600" fill="rgba(255,255,255,0.9)">Comunidad</text>
-                <!-- image block -->
-                <rect x="10" y="52" width="113" height="72" rx="6" fill="#274d20"/>
-                <ellipse cx="67" cy="88" rx="22" ry="22" fill="#3d7030" opacity="0.7"/>
-                <text x="56" y="93" font-family="Inter,sans-serif" font-size="16" fill="rgba(255,255,255,0.8)">🌱</text>
-                <!-- text rows -->
-                <rect x="10" y="130" width="80" height="6" rx="3" fill="rgba(255,255,255,0.45)"/>
-                <rect x="10" y="142" width="60" height="4" rx="2" fill="rgba(255,255,255,0.25)"/>
-                <!-- action row -->
-                <rect x="10" y="158" width="52" height="18" rx="9" fill="#5ba44a"/>
-                <rect x="68" y="158" width="52" height="18" rx="9" fill="rgba(255,255,255,0.07)"/>
-                <text x="22" y="170" font-family="Inter,sans-serif" font-size="7.5" fill="white">Seguir</text>
-                <!-- notch -->
-                <rect x="44" y="10" width="42" height="4" rx="2" fill="rgba(255,255,255,0.15)"/>
-              </g>
-            </svg>
+            <img src="civika.jpg" alt="Civika app mockup" />
           </div>
         </div><!-- /Civika -->
 
@@ -697,101 +621,9 @@
             <a href="#" class="btn-work">View work</a>
           </div>
 
-          <!-- E-Cup phone mockup (SVG) -->
+          <!-- E-Cup project image -->
           <div class="card-image ecup-bg">
-            <svg viewBox="0 0 520 320" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
-              <defs>
-                <radialGradient id="ecupGlow" cx="50%" cy="50%" r="60%">
-                  <stop offset="0%" stop-color="#a07848" stop-opacity="0.4"/>
-                  <stop offset="100%" stop-color="#c4a07a" stop-opacity="0"/>
-                </radialGradient>
-                <linearGradient id="coffeeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stop-color="#7b4a1e"/>
-                  <stop offset="100%" stop-color="#4a2c10"/>
-                </linearGradient>
-              </defs>
-
-              <rect width="520" height="320" fill="#c4a07a"/>
-              <ellipse cx="260" cy="160" rx="230" ry="150" fill="url(#ecupGlow)"/>
-
-              <!-- E-Cup header label -->
-              <text x="34" y="46" font-family="Inter,sans-serif" font-size="18" font-weight="800" fill="#3d2408">E-Cup ☕</text>
-              <text x="34" y="66" font-family="Inter,sans-serif" font-size="11" fill="#6b4010">Nescafé</text>
-
-              <!-- ── Phone 1 (left) ── -->
-              <g transform="translate(52,32) rotate(-7,55,120)">
-                <rect width="110" height="216" rx="14" fill="#f8efe2" stroke="rgba(0,0,0,0.08)" stroke-width="1"/>
-                <rect x="6" y="14" width="98" height="188" rx="8" fill="#f0e4d0"/>
-                <!-- top bar -->
-                <rect x="6" y="14" width="98" height="30" rx="8" fill="#c47a3a"/>
-                <text x="14" y="33" font-family="Inter,sans-serif" font-size="10" font-weight="700" fill="white">E-Cup</text>
-                <!-- coffee image area -->
-                <rect x="9" y="49" width="92" height="70" rx="6" fill="#d4b07a"/>
-                <!-- mug illustration -->
-                <rect x="32" y="58" width="46" height="38" rx="5" fill="url(#coffeeGrad)"/>
-                <ellipse cx="55" cy="58" rx="23" ry="6" fill="#5a3510"/>
-                <path d="M78,68 Q90,68 90,78 Q90,88 78,88" stroke="#5a3510" stroke-width="3" fill="none" stroke-linecap="round"/>
-                <!-- text rows -->
-                <rect x="9" y="124" width="70" height="5" rx="2" fill="rgba(0,0,0,0.2)"/>
-                <rect x="9" y="134" width="52" height="4" rx="2" fill="rgba(0,0,0,0.12)"/>
-                <!-- button -->
-                <rect x="9" y="150" width="92" height="20" rx="10" fill="#c47a3a"/>
-                <text x="34" y="164" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="white">Ver más</text>
-                <!-- notch -->
-                <rect x="37" y="10" width="36" height="4" rx="2" fill="rgba(0,0,0,0.1)"/>
-              </g>
-
-              <!-- ── Phone 2 (center, larger, upright) ── -->
-              <g transform="translate(192,18)">
-                <rect width="130" height="240" rx="14" fill="#f8efe2" stroke="rgba(0,0,0,0.08)" stroke-width="1"/>
-                <rect x="6" y="14" width="118" height="212" rx="8" fill="#f0e4d0"/>
-                <!-- top bar -->
-                <rect x="6" y="14" width="118" height="34" rx="8" fill="#c47a3a"/>
-                <text x="16" y="36" font-family="Inter,sans-serif" font-size="12" font-weight="800" fill="white">☕ E-Cup</text>
-                <!-- circular progress -->
-                <circle cx="65" cy="118" r="38" fill="none" stroke="rgba(0,0,0,0.08)" stroke-width="6"/>
-                <circle cx="65" cy="118" r="38" fill="none" stroke="#E8614E"
-                  stroke-width="6"
-                  stroke-dasharray="155 239"
-                  stroke-dashoffset="60"
-                  stroke-linecap="round"
-                  transform="rotate(-90,65,118)"/>
-                <text x="65" y="113" font-family="Inter,sans-serif" font-size="20" font-weight="800" fill="#3d2408" text-anchor="middle">37</text>
-                <text x="65" y="128" font-family="Inter,sans-serif" font-size="8" fill="#7a5020" text-anchor="middle">cups this month</text>
-                <!-- streak row -->
-                <rect x="10" y="166" width="50" height="20" rx="10" fill="rgba(196,122,58,0.25)"/>
-                <text x="18" y="180" font-family="Inter,sans-serif" font-size="8" fill="#3d2408">🔥 streak</text>
-                <rect x="68" y="166" width="50" height="20" rx="10" fill="rgba(196,122,58,0.25)"/>
-                <text x="78" y="180" font-family="Inter,sans-serif" font-size="8" fill="#3d2408">🏆 goal</text>
-                <!-- bottom button -->
-                <rect x="10" y="196" width="110" height="22" rx="11" fill="#c47a3a"/>
-                <text x="42" y="211" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="white">Registrar</text>
-                <!-- notch -->
-                <rect x="44" y="10" width="42" height="4" rx="2" fill="rgba(0,0,0,0.1)"/>
-              </g>
-
-              <!-- ── Phone 3 (right) ── -->
-              <g transform="translate(352,40) rotate(6,55,110)">
-                <rect width="110" height="210" rx="14" fill="#f8efe2" stroke="rgba(0,0,0,0.08)" stroke-width="1"/>
-                <rect x="6" y="14" width="98" height="182" rx="8" fill="#f0e4d0"/>
-                <!-- top bar -->
-                <rect x="6" y="14" width="98" height="28" rx="8" fill="#c47a3a"/>
-                <text x="14" y="31" font-family="Inter,sans-serif" font-size="10" font-weight="700" fill="white">Comunidad</text>
-                <!-- post blocks -->
-                <rect x="9" y="47" width="92" height="54" rx="6" fill="#ddc8a8"/>
-                <rect x="13" y="52" width="60" height="5" rx="2" fill="rgba(0,0,0,0.22)"/>
-                <rect x="13" y="62" width="44" height="4" rx="2" fill="rgba(0,0,0,0.14)"/>
-                <rect x="9" y="72" width="44" height="16" rx="8" fill="#E8614E"/>
-                <text x="18" y="83" font-family="Inter,sans-serif" font-size="7.5" fill="white">Ver post</text>
-                <rect x="9" y="106" width="92" height="44" rx="6" fill="#e8d8ba"/>
-                <rect x="13" y="112" width="55" height="5" rx="2" fill="rgba(0,0,0,0.2)"/>
-                <rect x="13" y="122" width="38" height="4" rx="2" fill="rgba(0,0,0,0.12)"/>
-                <rect x="9" y="156" width="92" height="22" rx="11" fill="#c47a3a"/>
-                <text x="28" y="170" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="white">Explorar</text>
-                <!-- notch -->
-                <rect x="37" y="10" width="36" height="4" rx="2" fill="rgba(0,0,0,0.1)"/>
-              </g>
-            </svg>
+            <img src="ecup.jpg" alt="E-Cup app mockup" />
           </div>
         </div><!-- /E-Cup -->
 
@@ -805,13 +637,8 @@
       <div class="about-inner">
 
         <div class="about-header">
-          <!-- Profile photo – replace src when ready -->
           <div class="profile-pic">
-            <svg class="placeholder-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="100" cy="100" r="100" fill="#3a3535"/>
-              <ellipse cx="100" cy="82" rx="36" ry="38" fill="#5a5252"/>
-              <ellipse cx="100" cy="172" rx="62" ry="50" fill="#5a5252"/>
-            </svg>
+            <img src="profile.jpg" alt="Daphne Hidalgo" />
           </div>
           <h2 class="about-title">About me</h2>
         </div>
