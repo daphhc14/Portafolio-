@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lockton Medical Claims OCR — Case Study · Daphne Hidalgo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet" />
+  <style>
+    /* ===========================  RESET & BASE  =========================== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --accent:          #0055CC;
+      --accent-2:        #00AAFF;
+      --grad:            linear-gradient(135deg, #00AAFF 0%, #0055CC 100%);
+      --navy:            #0A1628;
+      --bg:              #FFFFFF;
+      --bg-alt:          #F7F9FC;
+      --border:          #E5E7EB;
+      --text:            #0A1628;
+      --text-2:          #4B5563;
+      --text-3:          #9CA3AF;
+      --sidebar-w:       240px;
+      --section-pad:     80px 72px;
+      --radius:          12px;
+      --font:            'DM Sans', system-ui, -apple-system, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; font-size: 16px; }
+
+    body {
+      font-family: var(--font);
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.6;
+    }
+
+    /* ===========================  SIDEBAR  =========================== */
+    #sidebar {
+      position: fixed;
+      top: 0; left: 0;
+      width: var(--sidebar-w);
+      height: 100vh;
+      background: #fff;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      z-index: 100;
+      overflow-y: auto;
+    }
+
+    .sb-header {
+      padding: 28px 24px 22px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      text-decoration: none;
+      letter-spacing: 0.02em;
+      margin-bottom: 18px;
+      transition: opacity .2s;
+    }
+    .back-link:hover { opacity: .7; }
+    .back-link svg { width: 14px; height: 14px; }
+
+    .sb-eyebrow {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--text-3);
+      margin-bottom: 6px;
+    }
+
+    .sb-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.35;
+    }
+
+    #sb-nav { padding: 18px 0; flex: 1; }
+    #sb-nav ul { list-style: none; }
+
+    .nav-link {
+      display: block;
+      padding: 9px 24px;
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text-2);
+      text-decoration: none;
+      border-left: 3px solid transparent;
+      transition: color .15s, background .15s, border-color .15s;
+      line-height: 1.4;
+    }
+    .nav-link:hover { color: var(--accent); background: #F0F7FF; }
+    .nav-link.active {
+      color: var(--accent);
+      font-weight: 600;
+      background: #EEF4FF;
+      border-left-color: var(--accent);
+    }
+
+    /* ===========================  MAIN  =========================== */
+    #main { margin-left: var(--sidebar-w); }
+
+    /* ===========================  MOBILE HEADER  =========================== */
+    #mob-bar {
+      display: none;
+      position: sticky;
+      top: 0; z-index: 200;
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      padding: 14px 20px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .mob-title { font-size: 13px; font-weight: 600; }
+
+    .ham-btn {
+      background: none; border: none; cursor: pointer;
+      padding: 4px; color: var(--text);
+      display: flex; align-items: center;
+    }
+
+    #mob-drawer {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: min(80vw, 300px);
+      height: 100vh;
+      background: #fff;
+      border-right: 1px solid var(--border);
+      z-index: 300;
+      overflow-y: auto;
+      transform: translateX(-100%);
+      transition: transform .3s ease;
+    }
+    #mob-drawer.open { transform: translateX(0); }
+
+    #mob-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.45);
+      z-index: 299;
+    }
+    #mob-overlay.open { display: block; }
+
+    .drawer-top {
+      padding: 20px 24px 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 8px;
+    }
+    .drawer-top .sb-title { font-size: 13px; }
+
+    .close-btn {
+      background: none; border: none; cursor: pointer;
+      color: var(--text-2); padding: 4px;
+      display: flex; align-items: center;
+    }
+
+    /* ===========================  SECTION BASICS  =========================== */
+    .section { padding: var(--section-pad); }
+    .section-alt { background: var(--bg-alt); }
+
+    .eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    h2.sec-title {
+      font-size: clamp(26px, 3vw, 38px);
+      font-weight: 700;
+      line-height: 1.2;
+      color: var(--text);
+      margin-bottom: 14px;
+    }
+
+    .sec-lead {
+      font-size: 17px;
+      color: var(--text-2);
+      max-width: 660px;
+      line-height: 1.7;
+      margin-bottom: 52px;
+    }
+
+    /* ===========================  IMAGE PLACEHOLDERS  =========================== */
+    .ph-wrap {
+      position: relative;
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .ph-wrap img,
+    .ph-wrap video {
+      display: block;
+      width: 100%;
+      object-fit: cover;
+      border-radius: var(--radius);
+    }
+
+    .ph-wrap img[src=""],
+    .ph-wrap img:not([src]) {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .ph-label {
+      position: absolute;
+      inset: 0;
+      background: #F0F3F8;
+      border: 2px dashed #C8D3E0;
+      border-radius: var(--radius);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      pointer-events: none;
+    }
+    .ph-label.hidden { display: none; }
+
+    .ph-icon { color: #C8D3E0; }
+    .ph-icon svg { width: 28px; height: 28px; }
+
+    .ph-text {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #A0AEBA;
+    }
+
+    /* ===========================  HERO  =========================== */
+    #hero {
+      background: var(--navy);
+      padding: 80px 72px 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #hero::before {
+      content: '';
+      position: absolute;
+      top: -100px; right: -100px;
+      width: 540px; height: 540px;
+      background: radial-gradient(circle, rgba(0,170,255,.16) 0%, transparent 68%);
+      pointer-events: none;
+    }
+    #hero::after {
+      content: '';
+      position: absolute;
+      bottom: 60px; left: -60px;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(0,85,204,.18) 0%, transparent 68%);
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      position: relative; z-index: 1;
+      max-width: 900px;
+    }
+
+    .hero-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+
+    .hero-tag {
+      padding: 5px 15px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 500;
+      background: rgba(255,255,255,.1);
+      color: rgba(255,255,255,.8);
+      border: 1px solid rgba(255,255,255,.18);
+    }
+    .hero-tag.hi {
+      background: var(--grad);
+      color: #fff;
+      border: none;
+    }
+
+    .hero-title {
+      font-size: clamp(34px, 4.5vw, 60px);
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.1;
+      margin-bottom: 16px;
+    }
+
+    .hero-subtitle {
+      font-size: 18px;
+      color: rgba(255,255,255,.65);
+      max-width: 560px;
+      line-height: 1.65;
+      margin-bottom: 52px;
+    }
+
+    .hero-img-area {
+      margin-top: 0;
+    }
+
+    .hero-ph {
+      width: 100%;
+      height: 380px;
+      border-radius: 16px 16px 0 0;
+      background: rgba(255,255,255,.05);
+      border: 2px dashed rgba(255,255,255,.18);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      color: rgba(255,255,255,.3);
+    }
+    .hero-ph svg { width: 32px; height: 32px; }
+    .hero-ph span { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+
+    .hero-ph img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 16px 16px 0 0;
+    }
+
+    /* ===========================  CONTEXT  =========================== */
+    .context-body {
+      max-width: 720px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .context-body p {
+      font-size: 16px;
+      color: var(--text-2);
+      line-height: 1.75;
+    }
+
+    .context-body strong { color: var(--text); }
+
+    .highlight-box {
+      background: #EEF4FF;
+      border-left: 4px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 18px 22px;
+      font-size: 16px;
+      color: var(--text);
+      line-height: 1.65;
+      font-weight: 500;
+    }
+
+    /* ===========================  RESEARCH  =========================== */
+    .insight-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 36px;
+    }
+
+    .insight-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 26px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .insight-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 4px; height: 100%;
+      background: var(--grad);
+    }
+
+    .ic-num {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+    .ic-title { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+    .ic-body { font-size: 14px; color: var(--text-2); line-height: 1.6; }
+
+    .quote-block {
+      background: #F0F7FF;
+      border-left: 4px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 20px 26px;
+      margin: 28px 0;
+      max-width: 720px;
+    }
+    .quote-text {
+      font-size: 16px;
+      font-style: italic;
+      color: var(--text);
+      margin-bottom: 8px;
+      line-height: 1.65;
+    }
+    .quote-attr { font-size: 13px; color: var(--text-2); font-weight: 500; }
+
+    .benchmark-box {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px 26px;
+      max-width: 720px;
+      font-size: 15px;
+      color: var(--text-2);
+      line-height: 1.7;
+    }
+
+    /* ===========================  PERSONAS  =========================== */
+    .personas-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+    }
+
+    .persona-card {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .pc-head {
+      background: var(--grad);
+      padding: 26px 28px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .pc-photo-wrap {
+      flex-shrink: 0;
+    }
+
+    .pc-photo-wrap .ph-wrap {
+      width: 68px; height: 68px;
+      border-radius: 50%;
+      border: 3px solid rgba(255,255,255,.5);
+    }
+
+    .pc-photo-wrap .ph-label {
+      border-radius: 50%;
+    }
+
+    .pc-photo-wrap img {
+      width: 68px; height: 68px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .pc-type {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.75);
+      margin-bottom: 3px;
+    }
+    .pc-name { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 2px; }
+    .pc-sub { font-size: 13px; color: rgba(255,255,255,.7); }
+
+    .pc-body { padding: 22px 28px; }
+    .pc-meta { font-size: 13px; color: var(--text-3); font-weight: 500; margin-bottom: 16px; }
+
+    .pc-needs { list-style: none; }
+    .pc-needs li {
+      font-size: 14px;
+      color: var(--text-2);
+      padding: 9px 0 9px 22px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      line-height: 1.5;
+    }
+    .pc-needs li:last-child { border-bottom: none; }
+    .pc-needs li::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 16px;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--grad);
+    }
+
+    /* ===========================  DESIGN PROCESS  =========================== */
+    .process-wrap { max-width: 680px; }
+
+    .process-step {
+      display: flex;
+      gap: 24px;
+      position: relative;
+    }
+
+    .ps-left {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .ps-num {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: var(--grad);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(0,85,204,.3);
+      flex-shrink: 0;
+    }
+
+    .ps-line {
+      flex: 1;
+      width: 2px;
+      background: linear-gradient(to bottom, rgba(0,85,204,.3), rgba(0,170,255,.3));
+      margin: 6px 0;
+    }
+
+    .ps-right {
+      padding-bottom: 36px;
+      flex: 1;
+    }
+    .process-step:last-child .ps-right { padding-bottom: 0; }
+    .process-step:last-child .ps-line { display: none; }
+
+    .ps-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+      padding-top: 8px;
+    }
+    .ps-desc { font-size: 14px; color: var(--text-2); line-height: 1.65; }
+
+    /* ===========================  KEY DECISIONS  =========================== */
+    .decisions-list {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      max-width: 760px;
+    }
+
+    .decision {
+      padding: 24px 28px;
+      border-left: 4px solid var(--accent);
+      background: #fff;
+      border-radius: 0 12px 12px 0;
+      box-shadow: 0 2px 14px rgba(0,0,0,.05);
+    }
+
+    .decision-title { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+    .decision-body { font-size: 15px; color: var(--text-2); line-height: 1.7; }
+
+    /* ===========================  SCREENS  =========================== */
+    .screens-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+    }
+
+    .screen-card {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: box-shadow .25s, transform .25s;
+    }
+    .screen-card:hover {
+      box-shadow: 0 8px 32px rgba(0,0,0,.09);
+      transform: translateY(-3px);
+    }
+
+    .sc-img-wrap {
+      position: relative;
+      height: 220px;
+    }
+
+    .sc-img-wrap img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .sc-img-wrap img[src=""] { opacity: 0; }
+
+    .sc-ph {
+      position: absolute;
+      inset: 0;
+      background: #F0F3F8;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .sc-ph svg { width: 24px; height: 24px; color: #C0CDD8; }
+    .sc-ph span { font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #A8B8C5; }
+
+    /* hide placeholder when image loaded */
+    .sc-img-wrap img:not([src=""]) + .sc-ph { display: none; }
+
+    .sc-meta { padding: 18px 22px; }
+    .sc-label {
+      font-size: 10px; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 5px;
+    }
+    .sc-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 5px; }
+    .sc-desc { font-size: 13px; color: var(--text-2); line-height: 1.55; }
+
+    /* ===========================  OUTCOMES  =========================== */
+    #outcomes {
+      background: var(--navy);
+      padding: var(--section-pad);
+      position: relative;
+      overflow: hidden;
+    }
+    #outcomes::before {
+      content: '';
+      position: absolute;
+      top: -80px; right: -80px;
+      width: 420px; height: 420px;
+      background: radial-gradient(circle, rgba(0,170,255,.12) 0%, transparent 68%);
+      pointer-events: none;
+    }
+
+    .outcomes-inner { position: relative; z-index: 1; }
+
+    .out-eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: rgba(0,170,255,.8);
+      margin-bottom: 10px;
+    }
+
+    .out-title {
+      font-size: clamp(26px, 3vw, 38px);
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 52px;
+      line-height: 1.2;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .metric-card {
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 16px;
+      padding: 36px 24px;
+      text-align: center;
+    }
+
+    .metric-val {
+      font-size: clamp(40px, 4vw, 56px);
+      font-weight: 800;
+      background: var(--grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+      margin-bottom: 14px;
+      display: block;
+    }
+
+    .metric-label {
+      font-size: 14px;
+      color: rgba(255,255,255,.65);
+      line-height: 1.55;
+    }
+
+    /* ===========================  LEARNINGS  =========================== */
+    .learnings-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      max-width: 720px;
+    }
+
+    .learning-item {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      padding: 22px 24px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+
+    .li-num {
+      flex-shrink: 0;
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      background: var(--grad);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1px;
+    }
+
+    .li-text { font-size: 15px; color: var(--text-2); line-height: 1.7; }
+
+    /* ===========================  FOOTER  =========================== */
+    .cs-footer {
+      background: var(--bg-alt);
+      border-top: 1px solid var(--border);
+      padding: 36px 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .cs-footer p { font-size: 14px; color: var(--text-2); }
+
+    .back-portfolio {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 22px;
+      border-radius: 999px;
+      background: var(--grad);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: opacity .2s;
+    }
+    .back-portfolio:hover { opacity: .85; }
+    .back-portfolio svg { width: 14px; height: 14px; }
+
+    /* ===========================  RESPONSIVE  =========================== */
+    @media (max-width: 960px) {
+      :root { --section-pad: 56px 28px; }
+
+      #sidebar { display: none; }
+      #mob-bar { display: flex; }
+      #mob-drawer { display: block; }
+      #main { margin-left: 0; }
+
+      #hero { padding: 56px 28px 0; }
+
+      .insight-grid,
+      .personas-grid,
+      .screens-grid { grid-template-columns: 1fr; }
+
+      .metrics-grid { grid-template-columns: 1fr; gap: 14px; }
+
+      .cs-footer {
+        flex-direction: column;
+        padding: 32px 24px;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════
+     SIDEBAR
+════════════════════════════════════════ -->
+<aside id="sidebar">
+  <div class="sb-header">
+    <a href="index.html" class="back-link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      Back to Portfolio
+    </a>
+    <div class="sb-eyebrow">Case Study</div>
+    <h1 class="sb-title">Lockton Medical Claims OCR</h1>
+  </div>
+  <nav id="sb-nav" aria-label="Case study sections">
+    <ul>
+      <li><a href="#hero"      class="nav-link active">Overview</a></li>
+      <li><a href="#context"   class="nav-link">01 · Context</a></li>
+      <li><a href="#research"  class="nav-link">02 · Research</a></li>
+      <li><a href="#personas"  class="nav-link">03 · Personas</a></li>
+      <li><a href="#process"   class="nav-link">04 · Design Process</a></li>
+      <li><a href="#decisions" class="nav-link">05 · Key Decisions</a></li>
+      <li><a href="#screens"   class="nav-link">06 · The Screens</a></li>
+      <li><a href="#outcomes"  class="nav-link">07 · Outcomes</a></li>
+      <li><a href="#learnings" class="nav-link">08 · Learnings</a></li>
+    </ul>
+  </nav>
+</aside>
+
+<!-- ════════════════════════════════════════
+     MOBILE HEADER
+════════════════════════════════════════ -->
+<div id="mob-bar">
+  <span class="mob-title">Lockton Medical Claims OCR</span>
+  <button class="ham-btn" id="ham-btn" aria-label="Open navigation">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
+</div>
+
+<div id="mob-overlay"></div>
+
+<div id="mob-drawer">
+  <div class="drawer-top">
+    <span class="sb-title" style="font-size:13px;">Case Study Navigation</span>
+    <button class="close-btn" id="close-btn" aria-label="Close navigation">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <nav aria-label="Mobile case study navigation">
+    <ul id="mob-nav-list">
+      <li><a href="#hero"      class="nav-link">Overview</a></li>
+      <li><a href="#context"   class="nav-link">01 · Context</a></li>
+      <li><a href="#research"  class="nav-link">02 · Research</a></li>
+      <li><a href="#personas"  class="nav-link">03 · Personas</a></li>
+      <li><a href="#process"   class="nav-link">04 · Design Process</a></li>
+      <li><a href="#decisions" class="nav-link">05 · Key Decisions</a></li>
+      <li><a href="#screens"   class="nav-link">06 · The Screens</a></li>
+      <li><a href="#outcomes"  class="nav-link">07 · Outcomes</a></li>
+      <li><a href="#learnings" class="nav-link">08 · Learnings</a></li>
+    </ul>
+  </nav>
+</div>
+
+<!-- ════════════════════════════════════════
+     MAIN CONTENT
+════════════════════════════════════════ -->
+<main id="main">
+
+  <!-- ── HERO ── -->
+  <section id="hero" data-section>
+    <div class="hero-inner">
+      <div class="hero-tags">
+        <span class="hero-tag hi">AI / OCR</span>
+        <span class="hero-tag">Medical Insurance</span>
+        <span class="hero-tag">UX/UI Design</span>
+        <span class="hero-tag">Web Responsive</span>
+        <span class="hero-tag">Client: Lockton</span>
+      </div>
+      <h2 class="hero-title">Lockton Medical<br>Claims OCR</h2>
+      <p class="hero-subtitle">An AI-powered document reader that turns a tedious, paper-like reimbursement process into a guided 5-step digital experience.</p>
+    </div>
+    <div class="hero-img-area">
+      <div class="hero-ph" id="hero-ph">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <span>hero-mockup</span>
+        <img src="" data-placeholder="hero-mockup" alt="Lockton OCR hero mockup" style="display:none;" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 01 CONTEXT ── -->
+  <section id="context" class="section" data-section>
+    <div class="eyebrow">01 · Context</div>
+    <h2 class="sec-title">The problem: a tedious,<br>paper-like experience in a digital world</h2>
+    <div class="context-body">
+      <p>Lockton's policy holders had to fill out complex medical expense reimbursement forms manually — a process that was long, repetitive, and full of technical insurance language that most users didn't understand. The client came to us with a clear goal: create a new digital experience that made this process easier and faster.</p>
+      <div class="highlight-box">Our proposed solution was an OCR/AI-powered system embedded directly into Lockton's existing medical expenses platform. Instead of typing everything by hand, users would upload their documents and the system would extract and pre-fill the form data automatically.</div>
+    </div>
+  </section>
+
+  <!-- ── 02 RESEARCH ── -->
+  <section id="research" class="section section-alt" data-section>
+    <div class="eyebrow">02 · Research</div>
+    <h2 class="sec-title">What users actually struggled with</h2>
+    <p class="sec-lead">Before touching any design tool, I ran a research phase combining competitive benchmarking and surveys targeted at people who regularly deal with medical claims and insurance forms. The findings were consistent across respondents:</p>
+
+    <div class="insight-grid">
+      <div class="insight-card">
+        <div class="ic-num">Finding 01</div>
+        <div class="ic-title">Time-consuming repetition</div>
+        <p class="ic-body">Users had to re-enter information already present in their receipts and prescriptions — every single time.</p>
+      </div>
+      <div class="insight-card">
+        <div class="ic-num">Finding 02</div>
+        <div class="ic-title">Confusing terminology</div>
+        <p class="ic-body">Medical and insurance jargon made users unsure what was being asked, leading to errors and re-submissions.</p>
+      </div>
+      <div class="insight-card">
+        <div class="ic-num">Finding 03</div>
+        <div class="ic-title">No sense of progress</div>
+        <p class="ic-body">Users couldn't tell how far along they were, or what steps remained — creating anxiety and drop-off.</p>
+      </div>
+      <div class="insight-card">
+        <div class="ic-num">Finding 04</div>
+        <div class="ic-title">Lack of guidance</div>
+        <p class="ic-body">When something went wrong, there was no contextual help. Users had to call support or start over.</p>
+      </div>
+    </div>
+
+    <blockquote class="quote-block">
+      <p class="quote-text">"It feels like filling out a tax form, but nobody explains what anything means."</p>
+      <cite class="quote-attr">— Survey respondent, frequent insurance claims user</cite>
+    </blockquote>
+
+    <div class="benchmark-box">
+      <strong>Benchmark conclusion:</strong> The benchmark confirmed that competitors had a similar opportunity gap: most platforms lacked meaningful guidance, clear language, and any form of automation. This validated that even incremental improvements in these areas could represent a significant differentiator.
+    </div>
+  </section>
+
+  <!-- ── 03 PERSONAS ── -->
+  <section id="personas" class="section" data-section>
+    <div class="eyebrow">03 · User Personas</div>
+    <h2 class="sec-title">Two users with very different needs</h2>
+    <p class="sec-lead">From the research, two distinct user archetypes emerged — each with different comfort levels with technology, different priorities, and different failure points.</p>
+
+    <div class="personas-grid">
+
+      <!-- Persona 1 -->
+      <div class="persona-card">
+        <div class="pc-head">
+          <div class="pc-photo-wrap">
+            <div class="ph-wrap" style="width:68px;height:68px;border-radius:50%;">
+              <img src="" data-placeholder="persona-laura" alt="Laura persona photo" style="width:68px;height:68px;border-radius:50%;object-fit:cover;" />
+              <div class="ph-label">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C8D3E0" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="pc-type">Power User</div>
+            <div class="pc-name">Laura, la Ejecutiva Ocupada</div>
+            <div class="pc-sub">38 · Ops Manager · High digital literacy</div>
+          </div>
+        </div>
+        <div class="pc-body">
+          <div class="pc-meta">Goals &amp; pain points</div>
+          <ul class="pc-needs">
+            <li>Wants to finish in under 15 minutes</li>
+            <li>Trusts automation to be accurate</li>
+            <li>Frustrated by re-entering data she already has on paper</li>
+            <li>Needs a "fast track" for pre-validated submissions</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Persona 2 -->
+      <div class="persona-card">
+        <div class="pc-head">
+          <div class="pc-photo-wrap">
+            <div class="ph-wrap" style="width:68px;height:68px;border-radius:50%;">
+              <img src="" data-placeholder="persona-roberto" alt="Roberto persona photo" style="width:68px;height:68px;border-radius:50%;object-fit:cover;" />
+              <div class="ph-label">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C8D3E0" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="pc-type">Cautious User</div>
+            <div class="pc-name">Roberto, el Cuidador Familiar</div>
+            <div class="pc-sub">49 · SME Owner · Intermediate digital literacy</div>
+          </div>
+        </div>
+        <div class="pc-body">
+          <div class="pc-meta">Goals &amp; pain points</div>
+          <ul class="pc-needs">
+            <li>Needs clear step-by-step guidance</li>
+            <li>Anxious about submitting wrong documents</li>
+            <li>Frustrated by vague error messages</li>
+            <li>Needs to understand exactly what each field means</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── 04 DESIGN PROCESS ── -->
+  <section id="process" class="section section-alt" data-section>
+    <div class="eyebrow">04 · Design Process</div>
+    <h2 class="sec-title">Mapping the flow, then designing around it</h2>
+    <p class="sec-lead">In collaboration with Lockton, we mapped the complete user flow, balancing the insurer's data requirements with our goal of making the process as quick as possible. We identified a 5-step structure:</p>
+
+    <div class="process-wrap">
+
+      <div class="process-step">
+        <div class="ps-left">
+          <div class="ps-num">1</div>
+          <div class="ps-line"></div>
+        </div>
+        <div class="ps-right">
+          <div class="ps-title">Configuration</div>
+          <p class="ps-desc">User selects the type of claim and affected insured. Pre-filled data used when available from prior claims.</p>
+        </div>
+      </div>
+
+      <div class="process-step">
+        <div class="ps-left">
+          <div class="ps-num">2</div>
+          <div class="ps-line"></div>
+        </div>
+        <div class="ps-right">
+          <div class="ps-title">Information</div>
+          <p class="ps-desc">Medical details form — reason for visit, diagnosis, symptoms, hospital, and doctor. AI tooltips guide each field.</p>
+        </div>
+      </div>
+
+      <div class="process-step">
+        <div class="ps-left">
+          <div class="ps-num">3</div>
+          <div class="ps-line"></div>
+        </div>
+        <div class="ps-right">
+          <div class="ps-title">Documents</div>
+          <p class="ps-desc">User uploads ID, proof of address, bank statement, and invoices. OCR reads and extracts data automatically.</p>
+        </div>
+      </div>
+
+      <div class="process-step">
+        <div class="ps-left">
+          <div class="ps-num">4</div>
+          <div class="ps-line"></div>
+        </div>
+        <div class="ps-right">
+          <div class="ps-title">Validation</div>
+          <p class="ps-desc">User reviews pre-filled personal data and can correct any OCR errors before final submission.</p>
+        </div>
+      </div>
+
+      <div class="process-step">
+        <div class="ps-left">
+          <div class="ps-num">5</div>
+          <div class="ps-line"></div>
+        </div>
+        <div class="ps-right">
+          <div class="ps-title">Download</div>
+          <p class="ps-desc">Filled form is generated and available for download. The assistant explains next steps clearly.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── 05 KEY DECISIONS ── -->
+  <section id="decisions" class="section" data-section>
+    <div class="eyebrow">05 · Key Design Decisions</div>
+    <h2 class="sec-title">The choices that shaped the experience</h2>
+    <p class="sec-lead" style="margin-bottom:40px;"></p>
+
+    <div class="decisions-list">
+
+      <div class="decision">
+        <div class="decision-title">The AI assistant as a visible, friendly presence</div>
+        <p class="decision-body">Rather than hiding the AI in the background, I made it a small animated character — a glowing blue blob — visible throughout the entire process. This served a dual purpose: it made users feel accompanied and guided, and it made the AI system feel approachable rather than opaque. The character was deliberately soft, simple, and non-threatening.</p>
+      </div>
+
+      <div class="decision">
+        <div class="decision-title">Contextual tooltips above the assistant's head</div>
+        <p class="decision-body">Every form field that could cause confusion triggers a tooltip that appears above the AI character — not as a pop-up interrupting the flow, but as a natural "bubble" from the assistant. This preserved the guidance metaphor while keeping the interface clean.</p>
+      </div>
+
+      <div class="decision">
+        <div class="decision-title">A loading animation that communicates, not just waits</div>
+        <p class="decision-body">During the OCR processing phase, instead of a generic spinner, the assistant visually "reads" a document. This small detail reframes waiting time as active work being done on the user's behalf, building trust and encouraging patience.</p>
+      </div>
+
+      <div class="decision">
+        <div class="decision-title">Pre-filled data with an editable validation step</div>
+        <p class="decision-body">After the OCR runs, users land on a verification screen where they can review and correct any data the AI extracted. This acknowledges that AI isn't perfect and empowers the user — especially cautious users like Roberto — to feel in control without slowing down confident users like Laura.</p>
+      </div>
+
+      <div class="decision">
+        <div class="decision-title">White-label aesthetic within Lockton's design system</div>
+        <p class="decision-body">I explored moodboards and settled on a clean, modern medical platform aesthetic — light backgrounds, blue gradient accents, generous whitespace. Crucially, I achieved this new visual feel without breaking Lockton's existing UI design system, ensuring consistency across their platform and smooth developer handoff.</p>
+      </div>
+
+      <div class="decision">
+        <div class="decision-title">Real-time notifications and email delivery</div>
+        <p class="decision-body">The filled form is available for download immediately after the process, and also delivered via email. This accommodates both impatient users who want it now and those who prefer to retrieve it later — removing the pressure to act instantly.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── 06 THE SCREENS ── -->
+  <section id="screens" class="section section-alt" data-section>
+    <div class="eyebrow">06 · The Screens</div>
+    <h2 class="sec-title">From welcome to download in 5 steps</h2>
+    <p class="sec-lead"></p>
+
+    <div class="screens-grid">
+
+      <div class="screen-card">
+        <div class="sc-img-wrap">
+          <img src="" data-placeholder="screen-welcome" alt="Welcome screen — AI assistant introduction" />
+          <div class="sc-ph">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <span>screen-welcome</span>
+          </div>
+        </div>
+        <div class="sc-meta">
+          <div class="sc-label">Welcome</div>
+          <div class="sc-title">AI assistant introduction</div>
+          <p class="sc-desc">The animated character greets the user before the process begins, setting a guided, friendly tone.</p>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="sc-img-wrap">
+          <img src="" data-placeholder="screen-information" alt="Step 2 Information — Medical claim form" />
+          <div class="sc-ph">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <span>screen-information</span>
+          </div>
+        </div>
+        <div class="sc-meta">
+          <div class="sc-label">Step 2 · Information</div>
+          <div class="sc-title">Medical claim form</div>
+          <p class="sc-desc">Structured fields with contextual tooltips from the assistant. Plain language replaces insurance jargon.</p>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="sc-img-wrap">
+          <img src="" data-placeholder="screen-documents" alt="Step 3 Documents — Document upload" />
+          <div class="sc-ph">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <span>screen-documents</span>
+          </div>
+        </div>
+        <div class="sc-meta">
+          <div class="sc-label">Step 3 · Documents</div>
+          <div class="sc-title">Document upload</div>
+          <p class="sc-desc">Drag-and-drop areas with clear labels. The AI reads uploaded files and shows "Analyzing…" feedback while processing.</p>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="sc-img-wrap">
+          <img src="" data-placeholder="screen-validation" alt="Step 4 Validation — Review pre-filled data" />
+          <div class="sc-ph">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <span>screen-validation</span>
+          </div>
+        </div>
+        <div class="sc-meta">
+          <div class="sc-label">Step 4 · Validation</div>
+          <div class="sc-title">Review pre-filled data</div>
+          <p class="sc-desc">Users verify OCR-extracted information and edit any errors before submitting. Full control, minimum effort.</p>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="sc-img-wrap">
+          <img src="" data-placeholder="screen-download" alt="Step 5 Download — Completed form ready" />
+          <div class="sc-ph">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <span>screen-download</span>
+          </div>
+        </div>
+        <div class="sc-meta">
+          <div class="sc-label">Step 5 · Download</div>
+          <div class="sc-title">Completed form ready</div>
+          <p class="sc-desc">The filled format is available for download. The assistant explains what to do next with the signed document.</p>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="sc-img-wrap">
+          <img src="" data-placeholder="screen-ocr-progress" alt="Documents detail — OCR in progress" />
+          <div class="sc-ph">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <span>screen-ocr-progress</span>
+          </div>
+        </div>
+        <div class="sc-meta">
+          <div class="sc-label">Documents (detail)</div>
+          <div class="sc-title">OCR in progress</div>
+          <p class="sc-desc">Once a file is uploaded and validated, the assistant animates to signal active document reading — reducing anxiety during wait time.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── 07 OUTCOMES ── -->
+  <section id="outcomes" data-section>
+    <div class="outcomes-inner">
+      <div class="out-eyebrow">07 · Outcomes</div>
+      <h2 class="out-title">Measured against the original pain points</h2>
+
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <span class="metric-val">~70%</span>
+          <p class="metric-label">reduction in manual data entry with OCR auto-fill</p>
+        </div>
+        <div class="metric-card">
+          <span class="metric-val">5</span>
+          <p class="metric-label">clear, named progress stages replacing a vague single-page form</p>
+        </div>
+        <div class="metric-card">
+          <span class="metric-val">0</span>
+          <p class="metric-label">target for support escalation calls with in-context AI guidance</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 08 LEARNINGS ── -->
+  <section id="learnings" class="section" data-section>
+    <div class="eyebrow">08 · Learnings</div>
+    <h2 class="sec-title">What this project taught me</h2>
+    <p class="sec-lead" style="margin-bottom:36px;"></p>
+
+    <ul class="learnings-list">
+      <li class="learning-item">
+        <span class="li-num">1</span>
+        <p class="li-text">Making AI visible — not invisible — builds trust. Users are more patient and forgiving when they understand something is working on their behalf.</p>
+      </li>
+      <li class="learning-item">
+        <span class="li-num">2</span>
+        <p class="li-text">The correction step is not a failure mode; it's a feature. Designing for AI imperfection upfront creates a better experience than pretending the AI is always right.</p>
+      </li>
+      <li class="learning-item">
+        <span class="li-num">3</span>
+        <p class="li-text">Working within an existing design system forces creative constraints that often produce better, more cohesive results than designing from scratch.</p>
+      </li>
+      <li class="learning-item">
+        <span class="li-num">4</span>
+        <p class="li-text">Two very different personas can share one flow — as long as the design accommodates both speeds: fast-track for the confident user, guided detail for the cautious one.</p>
+      </li>
+    </ul>
+  </section>
+
+  <!-- Footer -->
+  <footer class="cs-footer">
+    <p>Daphne Hidalgo · UX/UI Designer</p>
+    <a href="index.html" class="back-portfolio">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      Back to Portfolio
+    </a>
+  </footer>
+
+</main><!-- /main -->
+
+<script>
+  // ── Scrollspy ──
+  const navLinks   = document.querySelectorAll('.nav-link');
+  const sections   = document.querySelectorAll('[data-section]');
+
+  const spy = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const id = entry.target.id;
+      navLinks.forEach(a => {
+        a.classList.toggle('active', a.getAttribute('href') === '#' + id);
+      });
+    });
+  }, { rootMargin: '-30% 0px -60% 0px', threshold: 0 });
+
+  sections.forEach(s => spy.observe(s));
+
+  // ── Smooth scroll ──
+  navLinks.forEach(a => {
+    a.addEventListener('click', e => {
+      const href = a.getAttribute('href');
+      if (!href.startsWith('#')) return;
+      e.preventDefault();
+      const target = document.querySelector(href);
+      if (target) target.scrollIntoView({ behavior: 'smooth' });
+
+      // close mobile drawer if open
+      mobDrawer.classList.remove('open');
+      mobOverlay.classList.remove('open');
+    });
+  });
+
+  // ── Mobile drawer ──
+  const hamBtn    = document.getElementById('ham-btn');
+  const mobDrawer = document.getElementById('mob-drawer');
+  const mobOverlay = document.getElementById('mob-overlay');
+  const closeBtn  = document.getElementById('close-btn');
+
+  function openDrawer()  { mobDrawer.classList.add('open');    mobOverlay.classList.add('open'); }
+  function closeDrawer() { mobDrawer.classList.remove('open'); mobOverlay.classList.remove('open'); }
+
+  hamBtn.addEventListener('click', openDrawer);
+  closeBtn.addEventListener('click', closeDrawer);
+  mobOverlay.addEventListener('click', closeDrawer);
+
+  // ── Show hero img when loaded ──
+  const heroImg = document.querySelector('#hero-ph img');
+  if (heroImg) {
+    heroImg.addEventListener('load', () => {
+      heroImg.style.display = '';
+      const ph = document.getElementById('hero-ph');
+      if (ph) { ph.style.background = 'none'; ph.style.border = 'none'; }
+    });
+  }
+</script>
+</body>
+</html>
